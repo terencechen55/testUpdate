@@ -1,70 +1,100 @@
 //
 //  ViewController.swift
-//  ACloudsAPP
+//  CloudsAPP
 //
-//  Created by 泰倫斯 on 2017/7/24.
-//  Copyright © 2017年 iOSA. All rights reserved.
+//  Created by mike on 2017/7/24.
+//  Copyright © 2017年 mike. All rights reserved.
 //
 
 import UIKit
 import Alamofire
-class ViewController: UIViewController {
 
+class ViewController: UIViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        Alamofire.request("https://httpbin.org/get").responseJSON { (response) in
-//            print(response.request! as Any)
-//            print(response.response! as Any)
-//            print(response.data! as Any)
-//            print(response.result)
-//            if let ARRAY = response.result.value {
-//                print("準備印出result中的資料：")
-//                print(ARRAY)
-//            }
+        // Do any additional setup after loading the view, typically from a nib.
+        
+        Alamofire.request("https://api.github.com/users/octocat/repos").responseJSON { response in
             
-            if let JASON = response.result.value {
-                if let dictionary =  JASON as? [String: Any] {
+                //更符合內容的命名變數名稱為 result_value
+                guard let result_value = response.result.value else { return }
+                
+                if let array = result_value as? [Any] {//將 result_value 解讀為 任何型態 的陣列
+                        //                    if let JSON_OBJECT = array.first {//將陣列的第1個 JSON 物件 做解析
+                        for JSON_OBJECT in array {
+                                if let dictionary = JSON_OBJECT as? [String: Any] {//將 JSON 物件轉成 key-value 陣列
+                                    
+                                        if let value = dictionary["id"] as? Int {
+                                            print("id: \(value)")
+                                        }
+                                        
+                                        if let value = dictionary["name"] as? String {
+                                            print("name: \(value)")
+                                        }
+                                        
+                                        if let value = dictionary["private"] as? Bool {
+                                            print("private: \(value)")
+                                        }
+                                        
+                                        if let value = dictionary["homepage"] as? String {
+                                            print("homepage: \(value)")
+                                        } else {
+                                            print("homepage: null")//不知道原始格式之下的處理
+                                        }
+                                } // if let dictionary = JSON_OBJECT
+                        }  // for JSON_OBJECT in array
+                }  // if let array
+        }  // Alamofire.request
+        
+        Alamofire.request("https://httpbin.org/get").responseJSON { response in
+            //            print(response.request as Any)
+            //            print(response.response as Any)
+            //            print(response.data as Any)
+            //            print(response.result)
+            
+            //            if let ARRAY = response.result.value {
+            //                print("準備印出 result 中的資料")
+            //                print(ARRAY)
+            //            }
+            
+            if let JSON = response.result.value {
+                if let dictionary = JSON as? [String: Any] {//將 JSON 物件，轉成 dictionary 的 key:value 的陣列
                     
-                    
-                    
-                    if let value = dictionary["args"] as? [String: Any]  {
-                        print("釋出key為args的值 --- \(value)")
-                    }
-                    
-                    if let header_dictionary = dictionary["headers"] as? [String: Any] {
-                            if let value = header_dictionary["Accept"] as? String {
-                                print("釋出header key為Accept的值 --- \(value)")
-                            }
-                            if let value = header_dictionary["Accept-Encoding"] as? String {
-                                print("釋出header key為Accept-Encoding的值 --- \(value)")
-                            }
-                            if let value = header_dictionary["Accept-Language"] as? String {
-                                print("釋出header key為Accept-Language的值 --- \(value)")
-                            }
-                            if let value = header_dictionary["Connection"] as? String {
-                                print("釋出header key為Connection的值 --- \(value)")
-                            }
-                            if let value = header_dictionary["Cookie"] as? String {
-                                print("釋出header key為Cookie的值 --- \(value)")
-                            }
-                    }
-
                     if let value = dictionary["origin"] as? String {
-                        print("釋出key為origin的值 --- \(value)")
+                        print("解出 key 為 origin 的值")
+                        print(value)
                     }
+                    
                     if let value = dictionary["url"] as? String {
-                        print("釋出key為url的值 --- \(value)")
+                        print("解出 key 為 url 的值")
+                        print(value)
+                    }
+                    
+                    //要當做 JSON 物件再解一次
+                    if let headers_dictionary = dictionary["headers"] as? [String: Any] {
+                        for (key, value) in headers_dictionary {
+                            if let value_string = value as? String {
+                                print(key + ":" + value_string)
+                            }
+                        }
+                    }
+                    
+                    //不用解了，因為沒東西
+                    if let value = dictionary["args"] as? String {//解不出來，因為不是 String
+                        print("解出 key 為 args 的值")
+                        print(value)
                     }
                 }
             }
         }
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        
+        // Dispose of any resources that can be recreated.
     }
-
-
+    
+    
 }
 
